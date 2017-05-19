@@ -18,8 +18,28 @@ SymbolType :: enum {
 
 SyntaxTreeNode :: struct {
     type     : SymbolType,
-    symbol   : u8,
+    symbol   : string, // symbols can be more than 1 char: \d or \(
     children : [dynamic]^SyntaxTreeNode,
+}
+
+split_into_tokens :: proc(exp : string) -> [dynamic]string {
+    ret : [dynamic] string;
+    skipNextOne := false;
+    for c, idx in exp {
+        if skipNextOne {
+            skipNextOne = false;
+            continue;
+        }
+
+        match c {
+            case '\\':
+                append(ret, exp[idx..idx+1]);
+                skipNextOne = true;
+            default:
+                append(ret, exp[idx..idx]);
+        }
+    }
+    return ret;
 }
 
 get_symbol_type :: proc(symbol : u8) -> SymbolType {
@@ -50,7 +70,8 @@ build_tree :: proc(exp : string) -> ^SyntaxTreeNode {
             panic("The Syntax is wrong");
         case Terminal:
             type = Terminal;
-            symbol = exp[pos];
+            // TODO string conversion
+            //symbol = exp[pos];
         case Option, Repeat, AtLeastOne: // unary operator (right side)
 
         case Or:                         // binary operator
@@ -89,11 +110,6 @@ find_closing_brackets:: proc(posInStr : u32, str: string) -> u32 {
         }
     }
     return 0;
-}
-
-split_into_tokens :: proc(exp : string) -> []string {
-
-
 }
 
 get_lowest_operator :: proc(str : string) -> (SymbolType, u32) {
@@ -169,13 +185,8 @@ print_tree :: proc (using tree : SyntaxTreeNode) {
 }
 
 test_regex :: proc () {
-    regexp := "(a)4";
+    regexp := "\\(\\..";
 
-    //println(get_lowest_operator(regexp));
+    println(split_into_tokens(regexp));
 
-    t := build_tree(regexp);
-    //print_tree(t^);
-
-    //println();
-    //println(o,"at",p);
 }
