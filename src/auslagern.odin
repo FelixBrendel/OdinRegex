@@ -57,6 +57,28 @@ print_tree :: proc (using tree : SyntaxTreeNode) {
     }
 }
 
+split_at_lowest_operator :: proc(tokenArray : []string) -> ([]string, []string, SymbolType ) {
+    using SymbolType;
+
+    // remove unnecessary other brackets
+    for is_in_brackets(tokenArray) {
+        tokenArray = tokenArray[1..len(tokenArray)-2];
+    }
+    pos, type   := get_lowest_operator(tokenArray);
+    left, right : []string;
+
+    match type {
+        case Terminal:
+        case Concat:
+        case Or:
+            left  = tokenArray[0..pos-1];
+            right = tokenArray[pos+1..len(tokenArray)-1];
+        case Repeat, Option, AtLeastOne:
+    }
+
+    return left, right, type;
+}
+
 get_lowest_operator :: proc(str : string) -> (SymbolType, u32) {
     // for returning
     operator : SymbolType;
@@ -119,30 +141,4 @@ get_lowest_operator :: proc(str : string) -> (SymbolType, u32) {
     }
 
     return operator, operatorPos;
-}
-
-OR_SYMBOL         :: '|';
-REPEAT_SYMBOL     :: '*';
-ATLEASTONE_SYMBOL :: '+';
-OPTION_SYMBOL     :: '?';
-
-
-is_in_brackets :: proc(exp : string) -> bool {
-    if exp[0] == '(' && find_closing_brackets(0, exp) == u32(len(exp)-1) {
-        return true;
-    }
-    return false;
-}
-
-find_closing_brackets:: proc(posInStr : u32, str: string) -> u32 {
-    nestness := 0;
-    for i in posInStr+1..<u32(len(str)) {
-        /*println("checking i", i, str[i]);*/
-        match str[i] {
-            case ')':
-                if nestness == 0 { return i; }
-                nestness--;
-        }
-    }
-    return 0;
 }
