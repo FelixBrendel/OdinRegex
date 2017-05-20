@@ -3,4 +3,5 @@ main
 *.bc
 *.ll
 *.o
+*.exe
 .atom-build.cson
