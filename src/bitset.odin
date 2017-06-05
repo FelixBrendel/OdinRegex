@@ -1,3 +1,4 @@
+// TODO(Felix): maybe inline these
 
 set :: proc(n : ^u64, bit : u8) {
 	mask : u64 = 1 << bit;
@@ -6,7 +7,7 @@ set :: proc(n : ^u64, bit : u8) {
 
 unset :: proc(n : ^u64, bit : u8) {
 	mask : u64 = 1 << bit;
-	mask = ~0~mask;
+	mask = ~u64(0)~mask;
 	n^ &= mask;
 }
 
@@ -24,7 +25,3 @@ get_all :: proc(n : u64) -> []u8 {
 	}
 	return ret[..];
 }
-
-/*get_union :: proc (s1 : u64, s2 : u64) -> u64 #inline {
-	return s1 & s2;
-}*/

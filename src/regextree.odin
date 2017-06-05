@@ -75,7 +75,7 @@ get_symbol_type :: proc(symbol : string) -> SymbolType {
         case REPEAT_SYMBOL:     return Repeat;
         case ATLEASTONE_SYMBOL: return AtLeastOne;
         case OPTION_SYMBOL:     return Option;
-        default:                return Terminal;
+        case:                   return Terminal;
     }
 }
 
@@ -220,7 +220,7 @@ print_tree :: proc(using t : ^SyntaxTreeNode, prefix : string, isTail : bool) {
     print("\tlast:  ", bitset.get_all(last));
 
     if type == SymbolType.Terminal {
-        print("\tid: [", number, "]");
+        print("\t\tid: [", number, "]");
         print("\tsymbol: '", symbol , "'");
     }
     // <-- and ends here
